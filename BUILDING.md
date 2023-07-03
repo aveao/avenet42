@@ -21,6 +21,7 @@ also, of course:
 
 note: not all GPIOs are usable on an esp32, as some are https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 
+```
 G27 -> SCD41 SCL (yellow)
 G26 -> SCD41 SDA (white)
 SCD41 SCL -> BMP180 SCL (yellow)
@@ -46,6 +47,9 @@ GND -> screen GND (black)
 3V3 -> screen VCC (red)
 
 Nothing -> screen RST
+```
+
+More to come!
 
 ### installing stuff
 
