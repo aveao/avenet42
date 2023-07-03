@@ -1,6 +1,6 @@
 ## avenet42
 
-An attempt to make a full-featured (similar to aranet4) while also being a bit more budget friendly.
+An attempt to make a full-featured (similar to [aranet4](https://aranet.com/products/aranet4/)) while also being more budget friendly (60-100eur).
 
 ![a picture of avenet42](.repo_assets/avenet42.jpg)
 
@@ -17,7 +17,7 @@ See [BUILDING.md](BUILDING.md) for wiring and flashing instructions. I'll design
 
 ### general TODOs (will be moved to issues eventually)
 
-- helper_convertfont: make an adj tool to generate text images from font files
+- tools/helper_convertfont: make an adj tool to generate font pngs from font files
 - hw: battery
 - hw: case
 - web: service workers for UI to work offline
