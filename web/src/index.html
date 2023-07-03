@@ -1,0 +1,207 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>avenet42</title>
+    <style>
+        html {
+            height: 100%;
+        }
+        body {
+            text-align: center;
+            font-family: sans-serif;
+            color: #ffffff;
+            background-color: #000000;
+            position: absolute;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .buttondiv {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            font-size: 30px;
+        }
+        .halfbigbutton {
+            height: 50px;
+            font-family: sans-serif;
+            font-weight: bold;
+            flex: 1;
+        }
+        .halfmediumbutton {
+            height: 25px;
+            font-family: sans-serif;
+            font-weight: bold;
+            flex: 0.25;
+        }
+        .flexdiv {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            width: 98%;
+            margin-top: 1%;
+        }
+        .chartdiv {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            width: 100%;
+        }
+        .configdiv {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .configentrydiv {
+            display: flex;
+            flex-direction: row;
+            padding-bottom: 10px;
+        }
+        .configentryvertdiv {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            padding-bottom: 10px;
+        }
+        .numberdisplay {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        .numbergraph {
+            max-height: 30vh;
+        }
+        .topnumberdisplay {
+            margin-top: 10px;
+        }
+        hr {
+            width: 98%;
+            border-color: gray;
+        }
+    </style>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+  </head>
+  <body>
+    <div class="flexdiv">
+        <div class="chartdiv" id="chartdiv">
+            <canvas class="numbergraph" id="co2graph"></canvas>
+            <div class="numberdisplay" id="co2display"><b>CO2:</b> </div>
+            <hr>
+            <canvas class="numbergraph" id="tempgraph"></canvas>
+            <div class="numberdisplay" id="tempdisplay"><b>Temp:</b> </div>
+            <hr>
+            <canvas class="numbergraph" id="rhgraph"></canvas>
+            <div class="numberdisplay" id="rhdisplay"><b>RH:</b> </div>
+            <hr>
+            <canvas class="numbergraph" id="pressurealtgraph"></canvas>
+            <div class="topnumberdisplay" id="pressuredisplay"><b>Pressure:</b> </div>
+            <div class="numberdisplay" id="elevationdisplay"><b>Elevation:</b> </div>
+        </div>
+        <div class="buttondiv">
+            <button id="dis_connectbutton" class="halfbigbutton" onclick="connect_disconnect_button();">connect</button>
+            <button id="config_button" class="halfbigbutton" onclick="toggle_config_button();">config</button>
+        </div>
+        <div class="configdiv" id="configdiv" style="display: none;">
+            <b>debug level:</b>
+            <div class="configentrydiv">
+                <input id="debug_level_input" type="number" value="1" min="0" max="2" style="flex: 1; margin-right: 5px;" />
+                <button id="apply_debug_level_button" class="halfmediumbutton" onclick="apply_debug_level();">apply</button>
+            </div>
+            <hr>
+
+            <b>local logs:</b>
+            <div class="configentrydiv">
+                <select id="local_logs_input" style="flex: 1; margin-right: 5px;" multiple>
+                  <option value="co2">CO2</option>
+                  <option value="c">Temperature</option>
+                  <option value="rh">Relative Humidity</option>
+                  <option value="pressure">Pressure</option>
+                </select>
+                <button id="apply_local_logs_button" class="halfmediumbutton" onclick="apply_local_logs();">apply</button>
+            </div>
+            <hr>
+
+            <b>co2 history size:</b>
+            <div class="configentrydiv">
+                <input id="co2_history_size_input" type="number" value="50" min="0" style="flex: 1; margin-right: 5px;" />
+                <button id="apply_co2_history_size_button" class="halfmediumbutton" onclick="apply_co2_history_size();">apply</button>
+            </div>
+            <hr>
+
+            <b>wlan:</b>
+            <div class="configentryvertdiv">
+                ssid:
+                <input id="wlan_ssid_input" style="flex: 1;" />
+                password:
+                <input id="wlan_password_input" style="flex: 1;" />
+                connection wait (s):
+                <input id="wlan_connection_wait_s_input" type="number" value="10" style="flex: 1;" />
+                <button id="apply_wlan_button" class="halfmediumbutton" onclick="apply_wlan();">apply</button>
+            </div>
+            <hr>
+
+            <b>bluetooth:</b>
+            <div class="configentryvertdiv">
+                bt name:
+                <input id="bt_name_input" value="avenet42" style="flex: 1;" />
+                bt advertisement frequency:
+                <input id="bt_advertisement_freq_us_input" type="number" value="250000" min="20000" style="flex: 1;" />
+                <button id="apply_bt_button" class="halfmediumbutton" onclick="apply_bt();">apply</button>
+            </div>
+            <hr>
+
+            <b>scd41:</b>
+            <div class="configentryvertdiv">
+                <div class="configentrydiv">
+                    low power:
+                    <input id="scd41_low_power_input" type="checkbox" checked/>
+                </div>
+                <div class="configentrydiv">
+                    automatic self-calibration:
+                    <input id="scd41_asc_input" type="checkbox" checked/>
+                </div>
+                <button id="apply_scd41_button" class="halfmediumbutton" onclick="apply_scd41();">apply</button>
+            </div>
+            <hr>
+
+            <b>bmp180:</b>
+            <div class="configentryvertdiv">
+                upper pressure:
+                <input id="bmp180_upper_pressure_input" type="number" value="130000" min="0" style="flex: 1;" />
+                lower pressure:
+                <input id="bmp180_lower_pressure_input" type="number" value="70000" min="0" style="flex: 1;" />
+                oversampling:
+                <input id="bmp180_oversampling_input" type="number" value="0" min="0" max="3" style="flex: 1;" />
+                oversampling wlan:
+                <input id="bmp180_oversampling_wlan_input" type="number" value="3" min="0" max="3" style="flex: 1;" />
+                <button id="apply_bmp180_button" class="halfmediumbutton" onclick="apply_bmp180();">apply</button>
+            </div>
+            <hr>
+
+            <b>influx:</b>
+            <div class="configentryvertdiv">
+                host:
+                <input id="influx_host_input" style="flex: 1;" />
+                bucket:
+                <input id="influx_bucket_input" style="flex: 1;" />
+                username:
+                <input id="influx_username_input" style="flex: 1;" />
+                password:
+                <input id="influx_password_input" style="flex: 1;" />
+                datapoint:
+                <input id="influx_datapoint_input" style="flex: 1;" />
+                <button id="apply_influx_button" class="halfmediumbutton" onclick="apply_influx();">apply</button>
+            </div>
+            <hr>
+
+            <b>resulting config:</b>
+            <textarea id="configbox">{}</textarea>
+            <button id="send_config_button" class="halfmediumbutton" onclick="send_config();">send</button>
+        </div>
+    <script type="module" src="avenet42graph.js"></script>
+  </body>
+</html>

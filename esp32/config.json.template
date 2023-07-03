@@ -1,0 +1,57 @@
+{
+    "debug": 1,
+    "lightsleep": false,
+    "screen": {
+        "enabled": true,
+        "refresh_rate": 4,
+        "refresh_rate_wlan": 4,
+        "debug": true,
+        "width": 122,
+        "height": 250
+    },
+    "pins": {
+        "i2c_scl": 27,
+        "i2c_sda": 26,
+        "wlan": 33,
+        "bt": 25,
+        "screen_cs": 19,
+        "screen_scl_clk": 18,
+        "screen_din_mosi": 23,
+        "screen_busy": 22,
+        "screen_dc": 21,
+        "screen_dummy": 15
+    },
+    "logs": [
+        "co2",
+        "c",
+        "rh",
+        "pressure"
+    ],
+    "history_size": 50,
+    "wlan": {
+        "ssid": "SSIDGoesHere",
+        "password": "password-goes-here",
+        "connection_wait_s": 10
+    },
+    "bluetooth": {
+        "name": "avenet42",
+        "advertisement_freq_us": 250000
+    },
+    "scd41": {
+        "low_power": true,
+        "asc": true
+    },
+    "bmp180": {
+        "upper_pressure": 130000,
+        "lower_pressure": 70000,
+        "oversampling": 3,
+        "oversampling_wlan": 3
+    },
+    "influx": {
+        "host": "http://192.0.2.1:8086",
+        "bucket": "bucket-goes-here",
+        "username": "username-goes-here",
+        "password": "password-goes-here",
+        "datapoint": "cvhhc-scd41-portable"
+    }
+}

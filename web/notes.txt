@@ -1,0 +1,6 @@
+let device = await navigator.bluetooth.requestDevice({filters: [{name: ['ave-sct41']}], optionalServices: ["environmental_sensing"]});
+let server = await device.gatt.connect();
+let service = await server.getPrimaryService('environmental_sensing');
+let characteristic = await service.getCharacteristic('temperature');
+let value = await characteristic.readValue();
+console.log(decoder.decode(config_value));

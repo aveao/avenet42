@@ -1,0 +1,15 @@
+{
+  "name": "avenet42-ui",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "npx parcel src/index.html",
+    "build": "npx parcel build src/index.html"
+  },
+  "devDependencies": {
+    "parcel": "^2.8.3"
+  },
+  "dependencies": {
+    "chart.js": "^4.2.1"
+  }
+}
