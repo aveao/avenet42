@@ -80,12 +80,12 @@ then merely boot your board and watch it upload/broadcast/display your sensor va
 
 ![avenet42 screen](.repo_assets/screen_data.jpg)
 
-1) Temp data from SCD41. Defaults to Celcius. Currently no way to change it to Fahrenheit.
-2) Relative Humidity data from SCD41.
-3) CO2 PPM data from SCD41.
-4) WLAN status indicator.
-5) Bluetooth status indicator.
-9) Baka display (free memory on the system. useful for watching for memory leaks. only shown if `config["screen"]["debug"]` is true).
+\1) Temp data from SCD41. Defaults to Celcius. Currently no way to change it to Fahrenheit.
+\2) Relative Humidity data from SCD41.
+\3) CO2 PPM data from SCD41.
+\4) WLAN status indicator.
+\5) Bluetooth status indicator.
+\9) Baka display (free memory on the system. useful for watching for memory leaks. only shown if `config["screen"]["debug"]` is true).
 
 ### fetching logs (if local logging is enabled)
 
