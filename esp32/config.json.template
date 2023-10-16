@@ -56,7 +56,7 @@
         "datapoint": "cvhhc-scd41-portable"
     },
     "led": {
-        "co2_trigger": 2000,
-        "co2_trigger_wlan": -1
+        "co2_trigger": -1,
+        "co2_trigger_wlan": 2000
     }
 }
