@@ -14,6 +14,7 @@
         "i2c_sda": 26,
         "wlan": 33,
         "bt": 25,
+        "led": 16,
         "screen_cs": 19,
         "screen_scl_clk": 18,
         "screen_din_mosi": 23,
@@ -53,5 +54,9 @@
         "username": "username-goes-here",
         "password": "password-goes-here",
         "datapoint": "cvhhc-scd41-portable"
+    },
+    "led": {
+        "co2_trigger": 2000,
+        "co2_trigger_wlan": -1
     }
 }

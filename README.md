@@ -2,6 +2,8 @@
 
 An attempt to make a full-featured (similar to [aranet4](https://aranet.com/products/aranet4/)) while also being more budget friendly (60-100eur).
 
+Written in micropython, initally because of the ease of development, and later for the fun challenge of memory management.
+
 ![a picture of avenet42](.repo_assets/avenet42.jpg)
 
 ### features

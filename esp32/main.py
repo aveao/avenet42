@@ -79,6 +79,8 @@ aioble.register_services(ble_service)
 
 wlan = network.WLAN(network.STA_IF)
 
+led_pin = Pin(config["pins"]["led"], machine.Pin.OUT)
+
 
 async def bluetooth_task():
     aioble.config(gap_name=config["bluetooth"]["name"])
@@ -260,6 +262,13 @@ async def sensor_task():
                 struct.pack("<I", int(relative_humidity * 100)), send_update=True
             )
             co2_historic_characteristic.write(historic_co2_data)
+
+            led_co2_trigger_value = config["led"][
+                "co2_trigger_wlan" if wlan_enabled() else "co2_trigger"
+            ]
+
+            if led_co2_trigger_value != -1:
+                led_pin.value(int(co2 >= led_co2_trigger_value))
 
             # Only refresh the screen every x cycles
             if config["screen"]["enabled"] and screen_refresh_wait == 0:
