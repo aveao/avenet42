@@ -283,7 +283,7 @@ function onDisconnected() {
 }
 
 function handle_co2_notifs(event) {
-    let value = decoder.decode(event.target.value);
+    let value = event.target.value.byteLength == 2 ? event.target.value.getUint16(0, true) : decoder.decode(event.target.value);
     const current_time = Date.now();
     addData(co2chart, format_time(current_time), value);
     if (co2chart.data.labels.length > chart_x_max) {

@@ -9,7 +9,7 @@ Written in micropython, initally because of the ease of development, and later f
 ### features
 
 - wifi: can upload data points to influxdb over wifi.
-- bluetooth: can fetch data over bluetooth. a simple web ui using webbluetooth is available, see `web/` for more info.
+- bluetooth: can fetch data over bluetooth. a simple web ui using webbluetooth is available, see `web/` for more info. can be used with esphome, see [esphome-avenet42.yaml](/esphome-avenet42.yaml) for more info.
 - screen: supports grayscale waveshare e-ink displays (tested with 1.33in v2).
 - local logging: optionally, the sensor data can be stored on flash to be fetched later, for example to save pressure data during a flight.
 

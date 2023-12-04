@@ -253,8 +253,12 @@ async def sensor_task():
             if "rh" in log_files:
                 log_files["rh"].write(struct.pack(">H", int(relative_humidity * 100)))
 
-            # co2_characteristic.write(struct.pack("<H", co2), send_update=True)
-            co2_characteristic.write(str(co2).encode(), send_update=True)
+            co2_characteristic.write(
+                str(co2).encode()
+                if config["bluetooth"].get("co2_as_string", False)
+                else struct.pack("<H", co2),
+                send_update=True,
+            )
             temp_characteristic.write(
                 struct.pack("<H", int(celcius * 100)), send_update=True
             )

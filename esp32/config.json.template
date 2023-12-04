@@ -36,7 +36,8 @@
     },
     "bluetooth": {
         "name": "avenet42",
-        "advertisement_freq_us": 250000
+        "advertisement_freq_us": 250000,
+        "co2_as_string": false
     },
     "scd41": {
         "low_power": true,
