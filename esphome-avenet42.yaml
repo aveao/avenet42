@@ -43,7 +43,7 @@ sensor:
     name: "${avenet42_name} Pressure"
     state_class: "measurement"
     device_class: "pressure"
-    accuracy_decimals: 1
+    accuracy_decimals: 2
     unit_of_measurement: "Pa"
     lambda: |-
       return (x[3] << 24 | x[2] << 16 | x[1] << 8 | x[0]) / 10.0;
@@ -55,7 +55,7 @@ sensor:
     name: "${avenet42_name} Humidity"
     state_class: "measurement"
     device_class: "humidity"
-    accuracy_decimals: 1
+    accuracy_decimals: 2
     unit_of_measurement: "%"
     lambda: |-
       return (x[0] | x[1] << 8) / 100.0;
