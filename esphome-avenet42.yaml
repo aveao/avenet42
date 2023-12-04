@@ -1,0 +1,62 @@
+# Based on https://github.com/stefanthoss/esphome-aranet4/blob/main/esphome-aranet4.yaml
+
+# You shouldn't use this directly, instead you should add the following to your esphome config:
+# substitutions:
+#   avenet42_name: "avenet42"
+#   avenet42_mac_address: "XX:XX:XX:XX:XX:XX"
+# packages:
+#   aveao.avenet42: github://aveao/avenet42/esphome-avenet42.yaml@main
+
+ble_client:
+  - mac_address: ${avenet42_mac_address}
+    id: avenet42
+
+sensor:
+  - platform: ble_client
+    type: characteristic
+    ble_client_id: avenet42
+    service_uuid: "181a"
+    characteristic_uuid: "00002b8c-0000-1000-8000-00805f9b34fb"
+    name: "${avenet42_name} CO2"
+    state_class: "measurement"
+    device_class: "carbon_dioxide"
+    unit_of_measurement: "ppm"
+    lambda: |-
+      return (x[0] | x[1] << 8);
+  - platform: ble_client
+    type: characteristic
+    ble_client_id: avenet42
+    service_uuid: "181a"
+    characteristic_uuid: "00002a6e-0000-1000-8000-00805f9b34fb"
+    name: "${avenet42_name} Temperature"
+    state_class: "measurement"
+    device_class: "temperature"
+    accuracy_decimals: 2
+    unit_of_measurement: "°C"
+    lambda: |-
+      return (x[0] | x[1] << 8) / 100.0;
+  - platform: ble_client
+    type: characteristic
+    ble_client_id: avenet42
+    service_uuid: "181a"
+    characteristic_uuid: "00002a6d-0000-1000-8000-00805f9b34fb"
+    name: "${avenet42_name} Pressure"
+    state_class: "measurement"
+    device_class: "pressure"
+    accuracy_decimals: 1
+    unit_of_measurement: "Pa"
+    lambda: |-
+      return (x[0] | x[1] << 8 | x[2] << 12 | x[3] << 16) / 10.0;
+      return (x[3] << 24 | x[2] << 16 | x[1] << 8 | x[0]) / 10.0;
+  - platform: ble_client
+    type: characteristic
+    ble_client_id: avenet42
+    service_uuid: "181a"
+    characteristic_uuid: "00002a6f-0000-1000-8000-00805f9b34fb"
+    name: "${avenet42_name} Humidity"
+    state_class: "measurement"
+    device_class: "humidity"
+    accuracy_decimals: 1
+    unit_of_measurement: "%"
+    lambda: |-
+      return (x[0] | x[1] << 8) / 100.0;
