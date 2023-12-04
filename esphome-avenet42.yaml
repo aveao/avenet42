@@ -46,7 +46,6 @@ sensor:
     accuracy_decimals: 1
     unit_of_measurement: "Pa"
     lambda: |-
-      return (x[0] | x[1] << 8 | x[2] << 12 | x[3] << 16) / 10.0;
       return (x[3] << 24 | x[2] << 16 | x[1] << 8 | x[0]) / 10.0;
   - platform: ble_client
     type: characteristic
