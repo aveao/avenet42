@@ -3,6 +3,7 @@
 # You shouldn't use this directly, instead you should add the following to your esphome config:
 # substitutions:
 #   avenet42_name: "avenet42"
+#   avenet42_id: "avenet42"
 #   avenet42_mac_address: "XX:XX:XX:XX:XX:XX"
 # packages:
 #   aveao.avenet42: github://aveao/avenet42/esphome-avenet42.yaml@main
@@ -18,6 +19,7 @@ sensor:
     service_uuid: "181a"
     characteristic_uuid: "00002b8c-0000-1000-8000-00805f9b34fb"
     name: "${avenet42_name} CO2"
+    id: "${avenet42_id}_co2"
     state_class: "measurement"
     device_class: "carbon_dioxide"
     unit_of_measurement: "ppm"
@@ -29,6 +31,7 @@ sensor:
     service_uuid: "181a"
     characteristic_uuid: "00002a6e-0000-1000-8000-00805f9b34fb"
     name: "${avenet42_name} Temperature"
+    id: "${avenet42_id}_temperature"
     state_class: "measurement"
     device_class: "temperature"
     accuracy_decimals: 2
@@ -41,6 +44,7 @@ sensor:
     service_uuid: "181a"
     characteristic_uuid: "00002a6d-0000-1000-8000-00805f9b34fb"
     name: "${avenet42_name} Pressure"
+    id: "${avenet42_id}_pressure"
     state_class: "measurement"
     device_class: "pressure"
     accuracy_decimals: 2
@@ -53,6 +57,7 @@ sensor:
     service_uuid: "181a"
     characteristic_uuid: "00002a6f-0000-1000-8000-00805f9b34fb"
     name: "${avenet42_name} Humidity"
+    id: "${avenet42_id}_humidity"
     state_class: "measurement"
     device_class: "humidity"
     accuracy_decimals: 2
