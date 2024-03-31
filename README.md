@@ -8,8 +8,8 @@ Written in micropython, initally because of the ease of development, and later f
 
 ### features
 
-- wifi: can upload data points to influxdb over wifi.
-- bluetooth: can fetch data over bluetooth. a simple web ui using webbluetooth is available, see `web/` for more info. can be used with esphome, see [esphome-avenet42.yaml](/esphome-avenet42.yaml) for more info.
+- wifi: can upload data points to influxdb over wifi. also has an optional webserver that makes data available over wifi. can be used with home assistant, just add [homeassistant_configuration.yaml](/homeassistant_configuration.yaml) to your `configuration.yaml` (change the IP accordingly).
+- bluetooth: can fetch data over bluetooth. a simple web ui using webbluetooth is available, see `btweb/` for more info. can be used with esphome, see [esphome-avenet42.yaml](/esphome-avenet42.yaml) for more info.
 - screen: supports grayscale waveshare e-ink displays (tested with 1.33in v2).
 - local logging: optionally, the sensor data can be stored on flash to be fetched later, for example to save pressure data during a flight.
 
@@ -22,10 +22,11 @@ See [BUILDING.md](BUILDING.md) for wiring and flashing instructions. I'll design
 - tools/helper_convertfont: make an adj tool to generate font pngs from font files
 - hw: battery
 - hw: case
-- web: service workers for UI to work offline
-- web: better UI
-- web: cleaner code
-- web: account for losing focus
-- web: fix disconnect button
-- web: complex comms to read config
+- web: make btweb UI available over web
+- btweb: service workers for UI to work offline
+- btweb: better UI
+- btweb: cleaner code
+- btweb: account for losing focus
+- btweb: fix disconnect button
+- btweb: complex comms to read config
 - micropython: complex comms to read config

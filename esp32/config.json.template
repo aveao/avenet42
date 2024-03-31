@@ -50,6 +50,7 @@
         "oversampling_wlan": 3
     },
     "influx": {
+        "enabled": false,
         "host": "http://192.0.2.1:8086",
         "bucket": "bucket-goes-here",
         "username": "username-goes-here",
@@ -59,5 +60,10 @@
     "led": {
         "co2_trigger": -1,
         "co2_trigger_wlan": 2000
+    },
+    "webserver": {
+        "enabled": false,
+        "port": 80,
+        "conn_timeout": 10
     }
 }

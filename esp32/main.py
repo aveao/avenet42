@@ -1,6 +1,7 @@
 from machine import SoftI2C, Pin
 import gc
 import uos
+import json
 import utime
 import machine
 import network
@@ -26,6 +27,7 @@ from helpers import (
     bt_enabled,
 )
 from influx_helpers import send_metrics_to_influx
+from web_server import set_webserver_status_json
 from scd41 import SCD41
 from bmp180 import BMP180
 
@@ -254,9 +256,11 @@ async def sensor_task():
                 log_files["rh"].write(struct.pack(">H", int(relative_humidity * 100)))
 
             co2_characteristic.write(
-                str(co2).encode()
-                if config["bluetooth"].get("co2_as_string", False)
-                else struct.pack("<H", co2),
+                (
+                    str(co2).encode()
+                    if config["bluetooth"].get("co2_as_string", False)
+                    else struct.pack("<H", co2)
+                ),
                 send_update=True,
             )
             temp_characteristic.write(
@@ -286,7 +290,18 @@ async def sensor_task():
                 screen_refresh_wait -= 1
 
             if await ensure_wlan_connected(wlan):
-                send_metrics_to_influx(co2, celcius, relative_humidity)
+                if config["webserver"]["enabled"]:
+                    await set_webserver_status_json(
+                        json.dumps(
+                            {
+                                "co2_ppm": co2,
+                                "temp_celcius": celcius,
+                                "relative_humidity": relative_humidity,
+                            }
+                        )
+                    )
+                if config["influx"].get("enabled", False):
+                    send_metrics_to_influx(co2, celcius, relative_humidity)
 
         total_sleep_time = 30 if config["scd41"]["low_power"] else 5
         current_ticks_s = utime.ticks_ms() / 1000
