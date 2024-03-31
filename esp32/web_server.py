@@ -96,7 +96,13 @@ async def server_callback(reader: uasyncio.StreamReader, writer: uasyncio.Stream
                 ),
             )
         else:
-            resp = generate_response(404, "404 :(")
+            resp = generate_response(
+                404,
+                (
+                    '<head><meta http-equiv="refresh" content="5; url=/"></head>\n'
+                    "404 :("
+                ),
+            )
 
         await writer.awrite(resp)
         await writer.drain()
