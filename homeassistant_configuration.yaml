@@ -1,4 +1,5 @@
 rest:
+  # set this to your own avenet42's IP!
   - resource: "http://192.168.0.129/status.json"
     scan_interval: 30
     sensor:
@@ -19,3 +20,14 @@ rest:
         value_template: "{{ value_json.temp_celsius }}"
         device_class: temperature
         unit_of_measurement: "°C"
+
+      # - name: "avenet42 Pressure"
+      #   unique_id: sensor.avenet42_pressure
+      #   value_template: "{{ value_json.pressure_pa }}"
+      #   device_class: atmospheric_pressure
+      #   unit_of_measurement: "Pa"
+
+      # - name: "avenet42 Elevation"
+      #   unique_id: sensor.avenet42_elevation
+      #   value_template: "{{ value_json.elevation_m }}"
+      #   unit_of_measurement: "m"
