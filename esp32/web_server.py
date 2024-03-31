@@ -1,11 +1,44 @@
 import uasyncio
 import network
+import json
 from helpers import debug_print, config, ensure_wlan_connected
 
 WEBSERVER_RUNNING = False
-STATUS_JSON_DATA = '{"co2_ppm": null, "temp_celcius": null, "relative_humidity": null}'
+STATUS_DATA = {}
+STATUS_RESPONSE_CACHES = {
+    "json": '{"co2_ppm": null, "temp_celcius": null, "relative_humidity": null}'
+}
 
 STATUS_CODE_TEXT = {200: "OK", 404: "Not Found"}
+
+
+def generate_status_prometheus(status: dict):
+    """Generate prometheus text-based exposition file."""
+    body = []
+    for key, value in status.items():
+        body += [f"# TYPE {key} gauge", f"{key} {value}", ""]
+
+    return "\n".join(body)
+
+
+def generate_status_json(status: dict):
+    """Generate status json file."""
+    return json.dumps(STATUS_DATA)
+
+
+def generate_status_body(status_type: str, status: dict):
+    """Generate a status body of a given type, doing caching in the process."""
+    global STATUS_RESPONSE_CACHES
+
+    if status_type not in STATUS_RESPONSE_CACHES:
+        debug_print("webserver cache miss for:", status_type)
+
+        if status_type == "prometheus":
+            STATUS_RESPONSE_CACHES[status_type] = generate_status_prometheus(status)
+        elif status_type == "json":
+            STATUS_RESPONSE_CACHES[status_type] = generate_status_json(status)
+
+    return STATUS_RESPONSE_CACHES[status_type]
 
 
 def generate_response(
@@ -24,7 +57,7 @@ def generate_response(
 
 
 async def server_callback(reader: uasyncio.StreamReader, writer: uasyncio.StreamWriter):
-    global STATUS_JSON_DATA
+    global STATUS_DATA
     try:
         try:
             req_header = await uasyncio.wait_for(
@@ -40,10 +73,24 @@ async def server_callback(reader: uasyncio.StreamReader, writer: uasyncio.Stream
 
         if req_header.startswith(b"GET /status.json"):
             resp = generate_response(
-                200, STATUS_JSON_DATA, content_type="application/json"
+                200,
+                generate_status_body("json", STATUS_DATA),
+                content_type="application/json",
+            )
+        elif req_header.startswith(b"GET /prometheus"):
+            resp = generate_response(
+                200,
+                generate_status_body("prometheus", STATUS_DATA),
+                content_type="text/plain; version=0.0.4",
             )
         elif req_header.startswith(b"GET /"):
-            resp = generate_response(200, 'try <a href="/status.json">/status.json</a>')
+            resp = generate_response(
+                200,
+                (
+                    'hi! this is an <a href="https://github.com/aveao/avenet42">avenet42</a>.<br>\n',
+                    'try <a href="/status.json">/status.json</a> or <a href="/prometheus">/prometheus</a>',
+                ),
+            )
         else:
             resp = generate_response(404, "404 :(")
 
@@ -58,14 +105,17 @@ async def server_callback(reader: uasyncio.StreamReader, writer: uasyncio.Stream
         await writer.wait_closed()
 
 
-async def set_webserver_status_json(json_data: str):
-    global STATUS_JSON_DATA
+async def set_webserver_status_data(data: dict):
+    global STATUS_DATA
+    global STATUS_RESPONSE_CACHES
     global WEBSERVER_RUNNING
 
     if not WEBSERVER_RUNNING:
         await setup_webserver()
 
-    STATUS_JSON_DATA = json_data
+    STATUS_DATA = data
+    # wipe the response caches
+    STATUS_RESPONSE_CACHES = {}
 
 
 async def setup_webserver():

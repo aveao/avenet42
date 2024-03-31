@@ -1,7 +1,6 @@
 from machine import SoftI2C, Pin
 import gc
 import uos
-import json
 import utime
 import machine
 import network
@@ -27,7 +26,7 @@ from helpers import (
     bt_enabled,
 )
 from influx_helpers import send_metrics_to_influx
-from web_server import set_webserver_status_json
+from web_server import set_webserver_status_data
 from scd41 import SCD41
 from bmp180 import BMP180
 
@@ -291,14 +290,12 @@ async def sensor_task():
 
             if await ensure_wlan_connected(wlan):
                 if config["webserver"]["enabled"]:
-                    await set_webserver_status_json(
-                        json.dumps(
-                            {
-                                "co2_ppm": co2,
-                                "temp_celcius": celcius,
-                                "relative_humidity": relative_humidity,
-                            }
-                        )
+                    await set_webserver_status_data(
+                        {
+                            "co2_ppm": co2,
+                            "temp_celcius": celcius,
+                            "relative_humidity": relative_humidity,
+                        }
                     )
                 if config["influx"].get("enabled", False):
                     send_metrics_to_influx(co2, celcius, relative_humidity)
