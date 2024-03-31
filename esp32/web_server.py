@@ -87,8 +87,8 @@ async def server_callback(reader: uasyncio.StreamReader, writer: uasyncio.Stream
             resp = generate_response(
                 200,
                 (
-                    'hi! this is an <a href="https://github.com/aveao/avenet42">avenet42</a>.<br>\n',
-                    'try <a href="/status.json">/status.json</a> or <a href="/prometheus">/prometheus</a>',
+                    'hi! this is an <a href="https://github.com/aveao/avenet42">avenet42</a>.<br>\n'
+                    'try <a href="/status.json">/status.json</a> or <a href="/prometheus">/prometheus</a>'
                 ),
             )
         else:
