@@ -87,7 +87,7 @@ async def server_callback(reader: uasyncio.StreamReader, writer: uasyncio.Stream
                 generate_status_body("prometheus", STATUS_DATA),
                 content_type="text/plain; version=0.0.4",
             )
-        elif req_header.startswith(b"GET /"):
+        elif req_header.startswith(b"GET / "):
             resp = generate_response(
                 200,
                 (
