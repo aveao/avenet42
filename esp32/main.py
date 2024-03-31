@@ -126,7 +126,7 @@ async def bt_complex_comms_task():
 async def bmp180_task(
     bmp180_inst: BMP180,
     scd41_inst: SCD41,
-) -> int:
+) -> (float, float):
     # Read and set ambient pressure to increase accuracy
     oversampling_level = (
         config["bmp180"]["oversampling_wlan"]
@@ -158,7 +158,7 @@ async def bmp180_task(
     elevation_characteristic.write(
         struct.pack("<I", int(elevation_m * 100)), send_update=True
     )
-    return pressure_pa
+    return pressure_pa, elevation_m
 
 
 async def sensor_task():
@@ -223,12 +223,14 @@ async def sensor_task():
         wlan.active(wlan_enabled())
 
         if use_bmp180:
-            pressure_pa = await bmp180_task(bmp180, scd41)
+            pressure_pa, elevation_m = await bmp180_task(bmp180, scd41)
             if "pressure" in log_files:
                 # drop the first byte, always 0
                 log_files["pressure"].write(
                     struct.pack(">I", int(pressure_pa * 10))[1:]
                 )
+        else:
+            pressure_pa = elevation_m = None
 
         while not await scd41.get_data_ready_status():
             await appropriate_async_sleep(1)
@@ -295,6 +297,8 @@ async def sensor_task():
                             "co2_ppm": co2,
                             "temp_celcius": celcius,
                             "relative_humidity": relative_humidity,
+                            "pressure_pa": pressure_pa,
+                            "elevation_m": elevation_m,
                         }
                     )
                 if config["influx"].get("enabled", False):

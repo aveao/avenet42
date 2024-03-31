@@ -6,7 +6,7 @@ from helpers import debug_print, config, ensure_wlan_connected
 WEBSERVER_RUNNING = False
 STATUS_DATA = {}
 STATUS_RESPONSE_CACHES = {
-    "json": '{"co2_ppm": null, "temp_celcius": null, "relative_humidity": null}'
+    "json": '{"co2_ppm": null, "temp_celcius": null, "relative_humidity": null, "pressure_pa": null, "elevation_m": null}'
 }
 
 STATUS_CODE_TEXT = {200: "OK", 404: "Not Found"}
@@ -16,6 +16,10 @@ def generate_status_prometheus(status: dict):
     """Generate prometheus text-based exposition file."""
     body = []
     for key, value in status.items():
+        # do not report non-existent values
+        if value is None:
+            continue
+
         body += [f"# TYPE {key} gauge", f"{key} {value}", ""]
 
     return "\n".join(body)
@@ -88,7 +92,7 @@ async def server_callback(reader: uasyncio.StreamReader, writer: uasyncio.Stream
                 200,
                 (
                     'hi! this is an <a href="https://github.com/aveao/avenet42">avenet42</a>.<br>\n'
-                    'try <a href="/status.json">/status.json</a> or <a href="/prometheus">/prometheus</a>'
+                    'try <a href="/status.json">/status.json</a> or <a href="/prometheus">/prometheus</a>.'
                 ),
             )
         else:

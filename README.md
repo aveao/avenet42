@@ -23,6 +23,7 @@ See [BUILDING.md](BUILDING.md) for wiring and flashing instructions. I'll design
 - hw: battery
 - hw: case
 - web: make btweb UI available over web
+- web: get/set config over web (with some amount of auth)
 - btweb: service workers for UI to work offline
 - btweb: better UI
 - btweb: cleaner code
