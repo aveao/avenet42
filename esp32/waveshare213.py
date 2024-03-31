@@ -188,16 +188,12 @@ def draw_character(
     char_width = int(font.width / 8)
 
     for y in range(font.height):
-        bit_offset = int(
-            char_width * char_index + (len(font.chars) * char_width * y)
-        )
+        bit_offset = int(char_width * char_index + (len(font.chars) * char_width * y))
         for x in range(char_width):
             font_file.seek(bit_offset + x)
             font_x_byte = font_file.read(1)[0]
             for xi in range(8):
-                pixel_bit = int(
-                    (font_x_byte & (2**xi)) == (2**xi)
-                )
+                pixel_bit = int((font_x_byte & (2**xi)) == (2**xi))
                 # pixel_bit = font_x_byte & (2 ** xi)
 
                 if not invert:

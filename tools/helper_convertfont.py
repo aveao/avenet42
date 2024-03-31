@@ -19,7 +19,7 @@ font_chars = "CRHpm1234567890.°%$Є"
 def convert_image_to_bits(image_path):
     # partly generated with chatgpt :skull:
     image = Image.open(image_path)
-    image = image.convert('1')
+    image = image.convert("1")
 
     pixel_data = image.load()
 
@@ -82,7 +82,7 @@ def bytes_get_character(bytes_array, character):
         bit_offset = int(char_width * char_index + (len(font_chars) * char_width * y))
         for x in range(char_width):
             for xi in range(8):
-                pixel_bit = int((int(bytes_array[bit_offset + x]) & (2 ** xi)) == (2 ** xi))
+                pixel_bit = int((int(bytes_array[bit_offset + x]) & (2**xi)) == (2**xi))
                 char_bits.append(pixel_bit)
 
     return char_bits
@@ -94,14 +94,16 @@ bytes_array = convert_bits_to_bytes(bits_array)
 
 # verify the bit/byte conversion
 for font_char in font_chars:
-    assert bits_get_character(bits_array, font_char) == bytes_get_character(bytes_array, font_char)
+    assert bits_get_character(bits_array, font_char) == bytes_get_character(
+        bytes_array, font_char
+    )
 
 
 with open(output_name, "w") as f:
     f.write(f"width = {font_width}\n")
     f.write(f"height = {font_height}\n")
-    f.write(f"chars = \"{font_chars}\"\n")
-    f.write(f"bin_filename = \"{output_name_bin}\"\n")
+    f.write(f'chars = "{font_chars}"\n')
+    f.write(f'bin_filename = "{output_name_bin}"\n')
 
 
 with open(output_name_bin, "wb") as f:

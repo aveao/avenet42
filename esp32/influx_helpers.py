@@ -7,7 +7,8 @@ INFLUX_WRITE_URL = f"{config['influx']['host']}/api/v2/write?bucket={config['inf
 def send_metrics_to_influx(co2, temp, rh):
     try:
         res = urequests.post(
-            INFLUX_WRITE_URL, data=f"{config['influx']['datapoint']} co2={co2},temp={temp},humidity={rh}"
+            INFLUX_WRITE_URL,
+            data=f"{config['influx']['datapoint']} co2={co2},temp={temp},humidity={rh}",
         )
         debug_print("ureq status:", res.status_code)
         res.close()

@@ -48,7 +48,12 @@ async def update_config(new_config_bytes: bytes):
         new_config = json.loads(new_config_bytes.decode())
         config.update(new_config)
     except Exception as e:
-        debug_print("caught error while trying to update config:", e, "with config", new_config_bytes)
+        debug_print(
+            "caught error while trying to update config:",
+            e,
+            "with config",
+            new_config_bytes,
+        )
         return
 
     with open("config.json", "w") as f:
