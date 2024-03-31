@@ -6,7 +6,7 @@ from helpers import debug_print, config, ensure_wlan_connected
 WEBSERVER_RUNNING = False
 STATUS_DATA = {}
 STATUS_RESPONSE_CACHES = {
-    "json": '{"co2_ppm": null, "temp_celcius": null, "relative_humidity": null, "pressure_pa": null, "elevation_m": null}'
+    "json": '{"co2_ppm": null, "temp_celsius": null, "relative_humidity": null, "pressure_pa": null, "elevation_m": null}'
 }
 
 STATUS_CODE_TEXT = {200: "OK", 404: "Not Found"}

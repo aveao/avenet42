@@ -142,13 +142,13 @@ class SCD41:
             return False, 0, 0, 0
 
         co2 = (measurement_data[0] << 8) + measurement_data[1]
-        celcius = -45 + (
+        celsius = -45 + (
             175 * ((measurement_data[3] << 8) + measurement_data[4]) / ((2**16) - 1)
         )
         relative_humidity = (
             100 * ((measurement_data[6] << 8) + measurement_data[7]) / ((2**16) - 1)
         )
         debug_print(
-            "co2 ppm:", co2, "temp celcius:", celcius, "rh %:", relative_humidity
+            "co2 ppm:", co2, "temp celsius:", celsius, "rh %:", relative_humidity
         )
-        return True, co2, celcius, relative_humidity
+        return True, co2, celsius, relative_humidity

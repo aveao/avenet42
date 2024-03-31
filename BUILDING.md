@@ -86,7 +86,7 @@ then merely boot your board and watch it upload/broadcast/display your sensor va
 
 ![avenet42 screen](.repo_assets/screen_data.jpg)
 
-(1) Temp data from SCD41. Defaults to Celcius. Currently no way to change it to Fahrenheit.<br>
+(1) Temp data from SCD41. Defaults to Celsius. Currently no way to change it to Fahrenheit.<br>
 (2) Relative Humidity data from SCD41.<br>
 (3) CO2 PPM data from SCD41.<br>
 (4) WLAN status indicator.<br>

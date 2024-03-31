@@ -238,7 +238,7 @@ async def sensor_task():
         (
             measurement_status,
             co2,
-            celcius,
+            celsius,
             relative_humidity,
         ) = await scd41.read_measurement()
 
@@ -252,7 +252,7 @@ async def sensor_task():
             if "co2" in log_files:
                 log_files["co2"].write(struct.pack(">H", co2))
             if "c" in log_files:
-                log_files["c"].write(struct.pack(">H", int(celcius * 100)))
+                log_files["c"].write(struct.pack(">H", int(celsius * 100)))
             if "rh" in log_files:
                 log_files["rh"].write(struct.pack(">H", int(relative_humidity * 100)))
 
@@ -265,7 +265,7 @@ async def sensor_task():
                 send_update=True,
             )
             temp_characteristic.write(
-                struct.pack("<H", int(celcius * 100)), send_update=True
+                struct.pack("<H", int(celsius * 100)), send_update=True
             )
             rh_characteristic.write(
                 struct.pack("<I", int(relative_humidity * 100)), send_update=True
@@ -281,7 +281,7 @@ async def sensor_task():
 
             # Only refresh the screen every x cycles
             if config["screen"]["enabled"] and screen_refresh_wait == 0:
-                waveshare213.draw_display(co2, celcius, relative_humidity)
+                waveshare213.draw_display(co2, celsius, relative_humidity)
                 screen_refresh_wait = (
                     config["screen"]["refresh_rate_wlan"]
                     if wlan_enabled()
@@ -295,14 +295,14 @@ async def sensor_task():
                     await set_webserver_status_data(
                         {
                             "co2_ppm": co2,
-                            "temp_celcius": celcius,
+                            "temp_celsius": celsius,
                             "relative_humidity": relative_humidity,
                             "pressure_pa": pressure_pa,
                             "elevation_m": elevation_m,
                         }
                     )
                 if config["influx"].get("enabled", False):
-                    send_metrics_to_influx(co2, celcius, relative_humidity)
+                    send_metrics_to_influx(co2, celsius, relative_humidity)
 
         total_sleep_time = 30 if config["scd41"]["low_power"] else 5
         current_ticks_s = utime.ticks_ms() / 1000

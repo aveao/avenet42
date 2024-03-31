@@ -277,7 +277,7 @@ def clean_fbuf():
         fbuf[i] = 0xFF
 
 
-def draw_display(co2_ppm, celcius, rh):
+def draw_display(co2_ppm, celsius, rh):
     clean_fbuf()
     gc.collect()
     top_bar_height = int(EPD_WIDTH / 3)
@@ -291,7 +291,7 @@ def draw_display(co2_ppm, celcius, rh):
     )
 
     draw_text(
-        "{:.1f}°C".format(celcius),
+        "{:.1f}°C".format(celsius),
         EPD_WIDTH - comic_code_24.height - 2,
         5,
         comic_code_24,
