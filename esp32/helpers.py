@@ -11,14 +11,16 @@ with open("config.json") as f:
     config = json.load(f)
 
 
-wlan_pin = Pin(config["pins"]["wlan"], Pin.IN, Pin.PULL_UP)
-bt_pin = Pin(config["pins"]["bt"], Pin.IN, Pin.PULL_UP)
+if config["pins"].get("wlan"):
+    wlan_pin = Pin(config["pins"]["wlan"], Pin.IN, Pin.PULL_UP)
 
 
 DATA_FORMAT_ID = {"co2": 0, "c": 1, "rh": 2, "pressure": 3}
 
 
 if config["bluetooth"]["enabled"]:
+    bt_pin = Pin(config["pins"]["bt"], Pin.IN, Pin.PULL_UP)
+
     import bluetooth
     # org.bluetooth.service.environmental_sensing
     _ENV_SENSE_UUID = bluetooth.UUID(0x181A)
@@ -79,10 +81,16 @@ async def replace_config(new_config_bytes: bytes):
 
 
 def wlan_enabled() -> bool:
+    if not config["pins"].get("wlan"):
+        return True
+
     return bool(wlan_pin.value())
 
 
 def bt_enabled() -> bool:
+    if not config["bluetooth"]["enabled"]:
+        return False
+
     return bool(bt_pin.value())
 
 

@@ -28,7 +28,7 @@ SCD41 SCL -> BMP180 SCL (yellow)
 SCD41 SDA -> BMP180 SDA (white)
 G33 -> wifi switch middle (brown)
 G25 -> bt switch middle (blue)
-G16 -> red LED (gray)
+G16 -> red LED (gray) (optional! if you don't wire it up, set it in config to null or just remove it entirely)
 
 G23 -> screen DIN/MOSI (yellow)
 G18 -> screen CLK/SCK (blue)
@@ -59,6 +59,9 @@ More to come!
 - install the libraries in [esp32/requirements.txt](esp32/requirements.txt), [see this link](https://docs.micropython.org/en/latest/reference/packages.html).
 - manually apply the following changes to the ble library you've installed https://github.com/micropython/micropython-lib/pull/629 (if it is not yet merged).
 - copy `esp32/config.json.template` to `esp32/config.json` and configure it to your liking.
+    - if you're on an esp32 variant without bluetooth (like esp32-s2), set bluetooth/enabled to false. you can then also omit the bt switch pin or set it to null.
+    - if you don't want to wire up wifi pin, you can set it to null or just leave it out. it'll default to true.
+    - if you're using hardware spi, set i2c/use_softi2c to false.
 - copy the files across:
 
 ```bash
@@ -68,8 +71,8 @@ ampy -p /dev/ttyUSB0 put main.py
 ampy -p /dev/ttyUSB0 put config.json
 ampy -p /dev/ttyUSB0 put helpers.py
 ampy -p /dev/ttyUSB0 put influx_helpers.py
-ampy -p /dev/ttyUSB0 put bmp180.py
-ampy -p /dev/ttyUSB0 put bmp280.py
+ampy -p /dev/ttyUSB0 put bmp180.py  # only if you have one
+ampy -p /dev/ttyUSB0 put bmp280.py  # only if you have one
 ampy -p /dev/ttyUSB0 put scd41.py
 ampy -p /dev/ttyUSB0 put comic_code_24.py
 ampy -p /dev/ttyUSB0 put comic_code_24.bin
