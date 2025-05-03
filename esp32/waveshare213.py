@@ -1,4 +1,4 @@
-from machine import SoftSPI, Pin
+from machine import SPI, SoftSPI, Pin
 import gc
 import time
 import comic_code_24
@@ -6,23 +6,29 @@ import comic_code_48
 from helpers import debug_print, config, wlan_enabled, bt_enabled
 
 CS_PIN = Pin(config["pins"]["screen_cs"], mode=Pin.OUT, value=1)
-SCK_CLK_PIN = Pin(config["pins"]["screen_scl_clk"], mode=Pin.OUT)
-DIN_MOSI_PIN = Pin(config["pins"]["screen_din_mosi"], mode=Pin.OUT)
 BUSY_PIN = Pin(config["pins"]["screen_busy"], mode=Pin.IN)
 DC_PIN = Pin(config["pins"]["screen_dc"], mode=Pin.OUT)
-
-DUMMY_PIN = Pin(config["pins"]["screen_dummy"], mode=Pin.IN)
 
 EPD_WIDTH = config["screen"]["width"]
 EPD_HEIGHT = config["screen"]["height"]
 
-spi = SoftSPI(
-    baudrate=2000000,
-    firstbit=SoftSPI.MSB,
-    sck=SCK_CLK_PIN,
-    mosi=DIN_MOSI_PIN,
-    miso=DUMMY_PIN,
-)
+if config["spi"]["use_softspi"]:
+    SCK_CLK_PIN = Pin(config["pins"]["screen_scl_clk"], mode=Pin.OUT)
+    DIN_MOSI_PIN = Pin(config["pins"]["screen_din_mosi"], mode=Pin.OUT)
+    DUMMY_PIN = Pin(config["pins"]["screen_dummy"], mode=Pin.IN)
+    spi = SoftSPI(
+        baudrate=config["spi"]["baudrate"],
+        firstbit=SoftSPI.MSB,
+        sck=SCK_CLK_PIN,
+        mosi=DIN_MOSI_PIN,
+        miso=DUMMY_PIN,
+    )
+else:
+    spi = SPI(
+        id=config["spi"]["hw_bus_id"],
+        baudrate=config["spi"]["baudrate"],
+        firstbit=SPI.MSB,
+    )
 
 
 LINE_WIDTH = int(EPD_WIDTH / 8) if (EPD_WIDTH % 8 == 0) else int(EPD_WIDTH / 8 + 1)

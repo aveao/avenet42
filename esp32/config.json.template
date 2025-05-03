@@ -26,7 +26,12 @@
         "use_softi2c": true,
         "frequency": 100000,
         "peripheral_id": 0
-    }
+    },
+    "spi": {
+        "use_softspi": true,
+        "baudrate": 2000000,
+        "hw_bus_id": 2
+    },
     "logs": [
         "co2",
         "c",

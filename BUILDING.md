@@ -61,7 +61,8 @@ More to come!
 - copy `esp32/config.json.template` to `esp32/config.json` and configure it to your liking.
     - if you're on an esp32 variant without bluetooth (like esp32-s2), set bluetooth/enabled to false. you can then also omit the bt switch pin or set it to null.
     - if you don't want to wire up wifi pin, you can set it to null or just leave it out. it'll default to true.
-    - if you're using hardware spi, set i2c/use_softi2c to false.
+    - if you're using hardware i2c, set i2c/use_softi2c to false and set peripheral_id (0 is usually fine).
+    - if you're using hardware spi, set spi/use_softspi to false and set bus_id ([on esp32-s2, you want 2 as 0/1 are for memory](https://www.espressif.com/sites/default/files/documentation/esp32-s2_datasheet_en.pdf)).
 - copy the files across:
 
 ```bash
