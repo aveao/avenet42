@@ -392,9 +392,10 @@ async def sensor_task():
 
         await appropriate_async_sleep(sleep_duration)
 
-        config_changes = config_characteristic.read()
-        if config_changes:
-            await update_config(config_changes)
+        if config["bluetooth"]["enabled"]:
+            config_changes = config_characteristic.read()
+            if config_changes:
+                await update_config(config_changes)
 
 
 async def main():
