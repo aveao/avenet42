@@ -20,8 +20,8 @@ See [BUILDING.md](BUILDING.md) for wiring and flashing instructions. I'll design
 ### general TODOs (will be moved to issues eventually)
 
 - tools/helper_convertfont: make an adj tool to generate font pngs from font files
-- hw: battery
-- hw: case
+- hw: battery -> done, yet to publish
+- hw: case -> done, yet to publish
 - web: make btweb UI available over web
 - web: get/set config over web (with some amount of auth)
 - btweb: service workers for UI to work offline

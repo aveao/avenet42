@@ -22,6 +22,11 @@
         "screen_dc": 21,
         "screen_dummy": 15
     },
+    "i2c": {
+        "use_softi2c": true,
+        "frequency": 100000,
+        "peripheral_id": 0
+    }
     "logs": [
         "co2",
         "c",
@@ -37,7 +42,8 @@
     "bluetooth": {
         "name": "avenet42",
         "advertisement_freq_us": 250000,
-        "co2_as_string": false
+        "co2_as_string": false,
+        "enabled": true
     },
     "scd41": {
         "low_power": true,
@@ -48,6 +54,12 @@
         "lower_pressure": 70000,
         "oversampling": 3,
         "oversampling_wlan": 3
+    },
+    "bmp280": {
+        "upper_pressure": 130000,
+        "lower_pressure": 70000,
+        "usecase": 1,
+        "usecase_wlan": 1
     },
     "influx": {
         "enabled": false,

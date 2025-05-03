@@ -91,6 +91,7 @@ async def server_callback(reader: uasyncio.StreamReader, writer: uasyncio.Stream
             resp = generate_response(
                 200,
                 (
+                    "<head><title>avenet42</title></head>\n"
                     'hi! this is an <a href="https://github.com/aveao/avenet42">avenet42</a>.<br>\n'
                     'try <a href="/status.json">/status.json</a> or <a href="/prometheus">/prometheus</a>.'
                 ),
@@ -99,6 +100,7 @@ async def server_callback(reader: uasyncio.StreamReader, writer: uasyncio.Stream
             resp = generate_response(
                 404,
                 (
+                    "<head><title>avenet42</title></head>\n"
                     '<head><meta http-equiv="refresh" content="5; url=/"></head>\n'
                     "404 :("
                 ),

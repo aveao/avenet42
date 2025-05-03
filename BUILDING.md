@@ -69,12 +69,14 @@ ampy -p /dev/ttyUSB0 put config.json
 ampy -p /dev/ttyUSB0 put helpers.py
 ampy -p /dev/ttyUSB0 put influx_helpers.py
 ampy -p /dev/ttyUSB0 put bmp180.py
+ampy -p /dev/ttyUSB0 put bmp280.py
 ampy -p /dev/ttyUSB0 put scd41.py
 ampy -p /dev/ttyUSB0 put comic_code_24.py
 ampy -p /dev/ttyUSB0 put comic_code_24.bin
 ampy -p /dev/ttyUSB0 put comic_code_48.py
 ampy -p /dev/ttyUSB0 put comic_code_48.bin
 ampy -p /dev/ttyUSB0 put waveshare213.py
+ampy -p /dev/ttyUSB0 put web_server.py
 ampy -p /dev/ttyUSB0 put waveshare_lut_full_update.bin
 ampy -p /dev/ttyUSB0 mkdir lib
 ampy -p /dev/ttyUSB0 mkdir logs

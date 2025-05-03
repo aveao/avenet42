@@ -95,9 +95,3 @@ class BMP180:
         X1 = (X1 * 3038) / 2**16
         X2 = (-7357 * pascal) / 2**16
         return pascal + (X1 + X2 + 3791) / 2**4
-
-    def pressure_to_altitude(
-        self, atmospheric_mbar: float, sea_level_mbar: float = 1013.25
-    ):
-        # https://github.com/adafruit/Adafruit_BMP085_Unified/blob/master/Adafruit_BMP085_U.cpp#L361
-        return 44330.0 * (1.0 - ((atmospheric_mbar / sea_level_mbar) ** 0.1903))

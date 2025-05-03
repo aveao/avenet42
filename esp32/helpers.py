@@ -5,7 +5,6 @@ import machine
 import network
 import uasyncio
 import ubinascii
-import bluetooth
 
 
 with open("config.json") as f:
@@ -19,26 +18,28 @@ bt_pin = Pin(config["pins"]["bt"], Pin.IN, Pin.PULL_UP)
 DATA_FORMAT_ID = {"co2": 0, "c": 1, "rh": 2, "pressure": 3}
 
 
-# org.bluetooth.service.environmental_sensing
-_ENV_SENSE_UUID = bluetooth.UUID(0x181A)
-# org.bluetooth.characteristic.co2_concentration
-_ENV_SENSE_CO2_UUID = bluetooth.UUID(0x2B8C)
-# org.bluetooth.characteristic.temperature
-_ENV_SENSE_TEMP_UUID = bluetooth.UUID(0x2A6E)
-# org.bluetooth.characteristic.humidity
-_ENV_SENSE_RH_UUID = bluetooth.UUID(0x2A6F)
-# org.bluetooth.characteristic.elevation
-_ENV_SENSE_ELEVATION_UUID = bluetooth.UUID(0x2A6C)
-# org.bluetooth.characteristic.pressure
-_ENV_SENSE_PRESSURE_UUID = bluetooth.UUID(0x2A6D)
-# co2 historic
-_ENV_SENSE_CO2_HISTORIC_UUID = bluetooth.UUID(0x6969)
-# config
-_ENV_CONFIG_UUID = bluetooth.UUID(0x6970)
-# complex comms
-_ENV_COMPLEX_COMMS_UUID = bluetooth.UUID(0x6971)
-# org.bluetooth.characteristic.gap.appearance.xml
-_ADV_APPEARANCE_GENERIC_THERMOMETER = 0x0300
+if config["bluetooth"]["enabled"]:
+    import bluetooth
+    # org.bluetooth.service.environmental_sensing
+    _ENV_SENSE_UUID = bluetooth.UUID(0x181A)
+    # org.bluetooth.characteristic.co2_concentration
+    _ENV_SENSE_CO2_UUID = bluetooth.UUID(0x2B8C)
+    # org.bluetooth.characteristic.temperature
+    _ENV_SENSE_TEMP_UUID = bluetooth.UUID(0x2A6E)
+    # org.bluetooth.characteristic.humidity
+    _ENV_SENSE_RH_UUID = bluetooth.UUID(0x2A6F)
+    # org.bluetooth.characteristic.elevation
+    _ENV_SENSE_ELEVATION_UUID = bluetooth.UUID(0x2A6C)
+    # org.bluetooth.characteristic.pressure
+    _ENV_SENSE_PRESSURE_UUID = bluetooth.UUID(0x2A6D)
+    # co2 historic
+    _ENV_SENSE_CO2_HISTORIC_UUID = bluetooth.UUID(0x6969)
+    # config
+    _ENV_CONFIG_UUID = bluetooth.UUID(0x6970)
+    # complex comms
+    _ENV_COMPLEX_COMMS_UUID = bluetooth.UUID(0x6971)
+    # org.bluetooth.characteristic.gap.appearance.xml
+    _ADV_APPEARANCE_GENERIC_THERMOMETER = 0x0300
 
 
 async def update_config(new_config_bytes: bytes):
@@ -143,3 +144,9 @@ async def _write_to_i2c(
             return read_data
         except OSError as e:
             debug_print("Handled read error:", e, "on command", command)
+
+def pressure_to_altitude(
+    atmospheric_mbar: float, sea_level_mbar: float = 1013.25
+):
+    # https://github.com/adafruit/Adafruit_BMP085_Unified/blob/master/Adafruit_BMP085_U.cpp#L361
+    return 44330.0 * (1.0 - ((atmospheric_mbar / sea_level_mbar) ** 0.1903))

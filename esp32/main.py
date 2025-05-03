@@ -1,4 +1,4 @@
-from machine import SoftI2C, Pin
+from machine import I2C, SoftI2C, Pin
 import gc
 import uos
 import utime
@@ -24,63 +24,84 @@ from helpers import (
     update_config,
     wlan_enabled,
     bt_enabled,
+    pressure_to_altitude,
 )
 from influx_helpers import send_metrics_to_influx
 from web_server import set_webserver_status_data
 from scd41 import SCD41
-from bmp180 import BMP180
 
 if config["screen"]:
     import waveshare213
 
 import uasyncio
-import aioble
 import struct
 
 
-i2c = SoftI2C(
-    scl=Pin(config["pins"]["i2c_scl"]), sda=Pin(config["pins"]["i2c_sda"]), freq=100_000
-)
+if config["i2c"]["use_softi2c"]:
+    i2c = SoftI2C(
+        scl=Pin(config["pins"]["i2c_scl"]),
+        sda=Pin(config["pins"]["i2c_sda"]),
+        freq=config["i2c"]["frequency"],
+    )
+else:
+    i2c = I2C(
+        config["i2c"]["peripheral_id"],
+        scl=Pin(config["pins"]["i2c_scl"]),
+        sda=Pin(config["pins"]["i2c_sda"]),
+        freq=config["i2c"]["frequency"],
+    )
 i2c_peripherals = i2c.scan()
 debug_print("I2C peripherals:", i2c_peripherals)
 
 # if scd41 sensor is not present, don't do anything
 while 0x62 not in i2c_peripherals:
     appropriate_sleep(10)
+    i2c_peripherals = i2c.scan()
+    debug_print("I2C peripherals:", i2c_peripherals)
 
 use_bmp180 = 0x77 in i2c_peripherals
+use_bmp280 = 0x76 in i2c_peripherals
 
-ble_service = aioble.Service(_ENV_SENSE_UUID)
-co2_characteristic = aioble.Characteristic(
-    ble_service, _ENV_SENSE_CO2_UUID, read=True, notify=True
-)
-temp_characteristic = aioble.Characteristic(
-    ble_service, _ENV_SENSE_TEMP_UUID, read=True, notify=True
-)
-rh_characteristic = aioble.Characteristic(
-    ble_service, _ENV_SENSE_RH_UUID, read=True, notify=True
-)
 if use_bmp180:
-    elevation_characteristic = aioble.Characteristic(
-        ble_service, _ENV_SENSE_ELEVATION_UUID, read=True, notify=True
+    from bmp180 import BMP180
+if use_bmp280:
+    from bmp280 import BMP280
+
+if config["bluetooth"]["enabled"]:
+    import aioble
+
+    ble_service = aioble.Service(_ENV_SENSE_UUID)
+    co2_characteristic = aioble.Characteristic(
+        ble_service, _ENV_SENSE_CO2_UUID, read=True, notify=True
     )
-    pressure_characteristic = aioble.Characteristic(
-        ble_service, _ENV_SENSE_PRESSURE_UUID, read=True, notify=True
+    temp_characteristic = aioble.Characteristic(
+        ble_service, _ENV_SENSE_TEMP_UUID, read=True, notify=True
     )
-config_characteristic = aioble.BufferedCharacteristic(
-    ble_service, _ENV_CONFIG_UUID, read=False, write=True, max_len=512
-)
-complex_comms_characteristic = aioble.BufferedCharacteristic(
-    ble_service, _ENV_COMPLEX_COMMS_UUID, read=True, write=True, max_len=512
-)
-co2_historic_characteristic = aioble.Characteristic(
-    ble_service, _ENV_SENSE_CO2_HISTORIC_UUID, read=True
-)
-aioble.register_services(ble_service)
+    rh_characteristic = aioble.Characteristic(
+        ble_service, _ENV_SENSE_RH_UUID, read=True, notify=True
+    )
+    if use_bmp180 or use_bmp280:
+        elevation_characteristic = aioble.Characteristic(
+            ble_service, _ENV_SENSE_ELEVATION_UUID, read=True, notify=True
+        )
+        pressure_characteristic = aioble.Characteristic(
+            ble_service, _ENV_SENSE_PRESSURE_UUID, read=True, notify=True
+        )
+    config_characteristic = aioble.BufferedCharacteristic(
+        ble_service, _ENV_CONFIG_UUID, read=False, write=True, max_len=512
+    )
+    complex_comms_characteristic = aioble.BufferedCharacteristic(
+        ble_service, _ENV_COMPLEX_COMMS_UUID, read=True, write=True, max_len=512
+    )
+    co2_historic_characteristic = aioble.Characteristic(
+        ble_service, _ENV_SENSE_CO2_HISTORIC_UUID, read=True
+    )
+    aioble.register_services(ble_service)
 
 wlan = network.WLAN(network.STA_IF)
 
-led_pin = Pin(config["pins"]["led"], machine.Pin.OUT)
+if config["pins"].get("led"):
+    led_pin = Pin(config["pins"]["led"], machine.Pin.OUT)
 
 
 async def bluetooth_task():
@@ -134,7 +155,7 @@ async def bmp180_task(
         else config["bmp180"]["oversampling"]
     )
     pressure_pa = await bmp180_inst.read_pressure(oversample_mode=oversampling_level)
-    elevation_m = bmp180_inst.pressure_to_altitude(pressure_pa / 100)
+    elevation_m = pressure_to_altitude(pressure_pa / 100)
 
     debug_print(
         "pressure Pa:",
@@ -152,19 +173,63 @@ async def bmp180_task(
 
     await scd41_inst.set_ambient_pressure(int(pressure_pa / 100))
     # Notify the pressure-related stuff early
-    pressure_characteristic.write(
-        struct.pack("<I", int(pressure_pa * 10)), send_update=True
+    if config["bluetooth"]["enabled"]:
+        pressure_characteristic.write(
+            struct.pack("<I", int(pressure_pa * 10)), send_update=True
+        )
+        elevation_characteristic.write(
+            struct.pack("<I", int(elevation_m * 100)), send_update=True
+        )
+    return pressure_pa, elevation_m
+
+
+async def bmp280_task(
+    bmp280_inst: BMP280,
+    scd41_inst: SCD41,
+) -> (float, float):
+    pressure_pa = bmp280_inst.pressure
+    elevation_m = pressure_to_altitude(pressure_pa / 100)
+
+    debug_print(
+        "pressure Pa:",
+        pressure_pa,
+        "elevation m:",
+        elevation_m,
     )
-    elevation_characteristic.write(
-        struct.pack("<I", int(elevation_m * 100)), send_update=True
-    )
+
+    if (
+        pressure_pa > config["bmp280"]["upper_pressure"]
+        or config["bmp280"]["lower_pressure"] > pressure_pa
+    ):
+        debug_print("Rejecting pressure due to drift")
+        return pressure_pa
+
+    await scd41_inst.set_ambient_pressure(int(pressure_pa / 100))
+    # Notify the pressure-related stuff early
+    if config["bluetooth"]["enabled"]:
+        pressure_characteristic.write(
+            struct.pack("<I", int(pressure_pa * 10)), send_update=True
+        )
+        elevation_characteristic.write(
+            struct.pack("<I", int(elevation_m * 100)), send_update=True
+        )
     return pressure_pa, elevation_m
 
 
 async def sensor_task():
     scd41 = SCD41(i2c)
-    bmp180 = BMP180(i2c)
-    await bmp180.init()
+    if use_bmp180:
+        bmp180 = BMP180(i2c)
+        await bmp180.init()
+    elif use_bmp280:
+        bmp280 = BMP280(i2c)
+        bmp_usecase = (
+            config["bmp280"]["usecase_wlan"]
+            if wlan_enabled()
+            else config["bmp280"]["usecase"]
+        )
+        bmp280.use_case(bmp_usecase)
+        bmp280.normal_measure()
     # account for hot restarts
     await scd41.stop_periodic_measurement()
 
@@ -229,6 +294,13 @@ async def sensor_task():
                 log_files["pressure"].write(
                     struct.pack(">I", int(pressure_pa * 10))[1:]
                 )
+        elif use_bmp280:
+            pressure_pa, elevation_m = await bmp280_task(bmp280, scd41)
+            if "pressure" in log_files:
+                # drop the first byte, always 0
+                log_files["pressure"].write(
+                    struct.pack(">I", int(pressure_pa * 10))[1:]
+                )
         else:
             pressure_pa = elevation_m = None
 
@@ -256,27 +328,28 @@ async def sensor_task():
             if "rh" in log_files:
                 log_files["rh"].write(struct.pack(">H", int(relative_humidity * 100)))
 
-            co2_characteristic.write(
-                (
-                    str(co2).encode()
-                    if config["bluetooth"].get("co2_as_string", False)
-                    else struct.pack("<H", co2)
-                ),
-                send_update=True,
-            )
-            temp_characteristic.write(
-                struct.pack("<H", int(celsius * 100)), send_update=True
-            )
-            rh_characteristic.write(
-                struct.pack("<I", int(relative_humidity * 100)), send_update=True
-            )
-            co2_historic_characteristic.write(historic_co2_data)
+            if config["bluetooth"]["enabled"]:
+                co2_characteristic.write(
+                    (
+                        str(co2).encode()
+                        if config["bluetooth"].get("co2_as_string", False)
+                        else struct.pack("<H", co2)
+                    ),
+                    send_update=True,
+                )
+                temp_characteristic.write(
+                    struct.pack("<H", int(celsius * 100)), send_update=True
+                )
+                rh_characteristic.write(
+                    struct.pack("<I", int(relative_humidity * 100)), send_update=True
+                )
+                co2_historic_characteristic.write(historic_co2_data)
 
             led_co2_trigger_value = config["led"][
                 "co2_trigger_wlan" if wlan_enabled() else "co2_trigger"
             ]
 
-            if led_co2_trigger_value != -1:
+            if led_co2_trigger_value != -1 and config["pins"].get("led"):
                 led_pin.value(int(co2 >= led_co2_trigger_value))
 
             # Only refresh the screen every x cycles
@@ -323,12 +396,12 @@ async def sensor_task():
 
 
 async def main():
-    sensor_task_instance = uasyncio.create_task(sensor_task())
-    bluetooth_task_instance = uasyncio.create_task(bluetooth_task())
-    bt_complex_comms_task_instance = uasyncio.create_task(bt_complex_comms_task())
-    await uasyncio.gather(
-        sensor_task_instance, bluetooth_task_instance, bt_complex_comms_task_instance
-    )
+    tasks = []
+    tasks.append(uasyncio.create_task(sensor_task()))
+    if config["bluetooth"]["enabled"]:
+        tasks.append(uasyncio.create_task(bluetooth_task()))
+        tasks.append(uasyncio.create_task(bt_complex_comms_task()))
+    await uasyncio.gather(*tasks)
 
 
 uasyncio.run(main())
