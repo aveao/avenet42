@@ -56,7 +56,7 @@ _BMP280_OS_MATRIX = [
     [BMP280_PRES_OS_2, BMP280_TEMP_OS_1, 9],
     [BMP280_PRES_OS_4, BMP280_TEMP_OS_1, 14],
     [BMP280_PRES_OS_8, BMP280_TEMP_OS_1, 23],
-    [BMP280_PRES_OS_16, BMP280_TEMP_OS_2, 44]
+    [BMP280_PRES_OS_16, BMP280_TEMP_OS_2, 44],
 ]
 
 # Use cases
@@ -68,12 +68,27 @@ BMP280_CASE_DROP = const(4)
 BMP280_CASE_INDOOR = const(5)
 
 _BMP280_CASE_MATRIX = [
-    [BMP280_POWER_NORMAL, BMP280_OS_ULTRAHIGH, BMP280_IIR_FILTER_4, BMP280_STANDBY_62_5],
+    [
+        BMP280_POWER_NORMAL,
+        BMP280_OS_ULTRAHIGH,
+        BMP280_IIR_FILTER_4,
+        BMP280_STANDBY_62_5,
+    ],
     [BMP280_POWER_NORMAL, BMP280_OS_STANDARD, BMP280_IIR_FILTER_16, BMP280_STANDBY_0_5],
-    [BMP280_POWER_FORCED, BMP280_OS_ULTRALOW, BMP280_IIR_FILTER_OFF, BMP280_STANDBY_0_5],
+    [
+        BMP280_POWER_FORCED,
+        BMP280_OS_ULTRALOW,
+        BMP280_IIR_FILTER_OFF,
+        BMP280_STANDBY_0_5,
+    ],
     [BMP280_POWER_NORMAL, BMP280_OS_STANDARD, BMP280_IIR_FILTER_4, BMP280_STANDBY_125],
     [BMP280_POWER_NORMAL, BMP280_OS_LOW, BMP280_IIR_FILTER_OFF, BMP280_STANDBY_0_5],
-    [BMP280_POWER_NORMAL, BMP280_OS_ULTRAHIGH, BMP280_IIR_FILTER_16, BMP280_STANDBY_0_5]
+    [
+        BMP280_POWER_NORMAL,
+        BMP280_OS_ULTRAHIGH,
+        BMP280_IIR_FILTER_16,
+        BMP280_STANDBY_0_5,
+    ],
 ]
 
 _BMP280_REGISTER_ID = const(0xD0)
@@ -94,18 +109,18 @@ class BMP280:
         # < little-endian
         # H unsigned short
         # h signed short
-        self._T1 = unp('<H', self._read(0x88, 2))[0]
-        self._T2 = unp('<h', self._read(0x8A, 2))[0]
-        self._T3 = unp('<h', self._read(0x8C, 2))[0]
-        self._P1 = unp('<H', self._read(0x8E, 2))[0]
-        self._P2 = unp('<h', self._read(0x90, 2))[0]
-        self._P3 = unp('<h', self._read(0x92, 2))[0]
-        self._P4 = unp('<h', self._read(0x94, 2))[0]
-        self._P5 = unp('<h', self._read(0x96, 2))[0]
-        self._P6 = unp('<h', self._read(0x98, 2))[0]
-        self._P7 = unp('<h', self._read(0x9A, 2))[0]
-        self._P8 = unp('<h', self._read(0x9C, 2))[0]
-        self._P9 = unp('<h', self._read(0x9E, 2))[0]
+        self._T1 = unp("<H", self._read(0x88, 2))[0]
+        self._T2 = unp("<h", self._read(0x8A, 2))[0]
+        self._T3 = unp("<h", self._read(0x8C, 2))[0]
+        self._P1 = unp("<H", self._read(0x8E, 2))[0]
+        self._P2 = unp("<h", self._read(0x90, 2))[0]
+        self._P3 = unp("<h", self._read(0x92, 2))[0]
+        self._P4 = unp("<h", self._read(0x94, 2))[0]
+        self._P5 = unp("<h", self._read(0x96, 2))[0]
+        self._P6 = unp("<h", self._read(0x98, 2))[0]
+        self._P7 = unp("<h", self._read(0x9A, 2))[0]
+        self._P8 = unp("<h", self._read(0x9C, 2))[0]
+        self._P9 = unp("<h", self._read(0x9E, 2))[0]
 
         # output raw
         self._t_raw = 0
@@ -182,17 +197,20 @@ class BMP280:
         self._gauge()
         if self._t_fine == 0:
             var1 = (((self._t_raw >> 3) - (self._T1 << 1)) * self._T2) >> 11
-            var2 = (((((self._t_raw >> 4) - self._T1)
-                      * ((self._t_raw >> 4)
-                         - self._T1)) >> 12)
-                    * self._T3) >> 14
+            var2 = (
+                (
+                    (((self._t_raw >> 4) - self._T1) * ((self._t_raw >> 4) - self._T1))
+                    >> 12
+                )
+                * self._T3
+            ) >> 14
             self._t_fine = var1 + var2
 
     @property
     def temperature(self):
         self._calc_t_fine()
         if self._t == 0:
-            self._t = ((self._t_fine * 5 + 128) >> 8) / 100.
+            self._t = ((self._t_fine * 5 + 128) >> 8) / 100.0
         return self._t
 
     @property
@@ -221,14 +239,14 @@ class BMP280:
 
     def _write_bits(self, address, value, length, shift=0):
         d = self._read(address)[0]
-        m = int('1' * length, 2) << shift
+        m = int("1" * length, 2) << shift
         d &= ~m
         d |= m & value << shift
         self._write(address, d)
 
     def _read_bits(self, address, length, shift=0):
         d = self._read(address)[0]
-        return d >> shift & int('1' * length, 2)
+        return d >> shift & int("1" * length, 2)
 
     @property
     def standby(self):

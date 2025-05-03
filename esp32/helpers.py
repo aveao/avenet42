@@ -22,6 +22,7 @@ if config["bluetooth"]["enabled"]:
     bt_pin = Pin(config["pins"]["bt"], Pin.IN, Pin.PULL_UP)
 
     import bluetooth
+
     # org.bluetooth.service.environmental_sensing
     _ENV_SENSE_UUID = bluetooth.UUID(0x181A)
     # org.bluetooth.characteristic.co2_concentration
@@ -153,8 +154,7 @@ async def _write_to_i2c(
         except OSError as e:
             debug_print("Handled read error:", e, "on command", command)
 
-def pressure_to_altitude(
-    atmospheric_mbar: float, sea_level_mbar: float = 1013.25
-):
+
+def pressure_to_altitude(atmospheric_mbar: float, sea_level_mbar: float = 1013.25):
     # https://github.com/adafruit/Adafruit_BMP085_Unified/blob/master/Adafruit_BMP085_U.cpp#L361
     return 44330.0 * (1.0 - ((atmospheric_mbar / sea_level_mbar) ** 0.1903))

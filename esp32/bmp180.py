@@ -46,12 +46,12 @@ class BMP180:
     async def read_temperature(self) -> int:
         await _write_to_i2c(
             self.i2c_instance,
-            b"\xF4\x2E",
+            b"\xf4\x2e",
             i2c_device=self.i2c_address,
             command_wait_s=0.005,
         )
         temp_raw = await _write_to_i2c(
-            self.i2c_instance, b"\xF6", i2c_device=self.i2c_address, read_bytes=2
+            self.i2c_instance, b"\xf6", i2c_device=self.i2c_address, read_bytes=2
         )
         temp_raw = struct.unpack(">h", temp_raw)[0]
 
@@ -70,7 +70,7 @@ class BMP180:
             command_wait_s=(0.007 * oversample_mode),
         )
         pressure_raw = await _write_to_i2c(
-            self.i2c_instance, b"\xF6", i2c_device=self.i2c_address, read_bytes=3
+            self.i2c_instance, b"\xf6", i2c_device=self.i2c_address, read_bytes=3
         )
         # TODO: improve this
         B5_raw = (int(temp * 10) << 4) - 8
