@@ -9,16 +9,6 @@ from helpers import (
     appropriate_sleep,
     appropriate_async_sleep,
     ensure_wlan_connected,
-    _ENV_SENSE_UUID,
-    _ENV_SENSE_CO2_UUID,
-    _ENV_SENSE_TEMP_UUID,
-    _ENV_SENSE_RH_UUID,
-    _ENV_SENSE_ELEVATION_UUID,
-    _ENV_SENSE_PRESSURE_UUID,
-    _ENV_SENSE_CO2_HISTORIC_UUID,
-    _ADV_APPEARANCE_GENERIC_THERMOMETER,
-    _ENV_CONFIG_UUID,
-    _ENV_COMPLEX_COMMS_UUID,
     DATA_FORMAT_ID,
     config,
     update_config,
@@ -69,6 +59,18 @@ if use_bmp280:
 
 if config["bluetooth"]["enabled"]:
     import aioble
+    from helpers import (
+        _ENV_SENSE_UUID,
+        _ENV_SENSE_CO2_UUID,
+        _ENV_SENSE_TEMP_UUID,
+        _ENV_SENSE_RH_UUID,
+        _ENV_SENSE_ELEVATION_UUID,
+        _ENV_SENSE_PRESSURE_UUID,
+        _ENV_SENSE_CO2_HISTORIC_UUID,
+        _ADV_APPEARANCE_GENERIC_THERMOMETER,
+        _ENV_CONFIG_UUID,
+        _ENV_COMPLEX_COMMS_UUID,
+    )
 
     ble_service = aioble.Service(_ENV_SENSE_UUID)
     co2_characteristic = aioble.Characteristic(
