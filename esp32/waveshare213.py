@@ -280,7 +280,7 @@ def clean_fbuf():
         fbuf[i] = 0xFF
 
 
-def draw_display(co2_ppm, celsius, rh, altitude: int = 0):
+def draw_display(co2_ppm, celsius, rh, altitude: int | None = None):
     clean_fbuf()
     gc.collect()
     top_bar_height = int(EPD_WIDTH / 3)
@@ -336,7 +336,7 @@ def draw_display(co2_ppm, celsius, rh, altitude: int = 0):
         offset_for_length=2,
     )
 
-    if altitude:
+    if altitude is not None:
         draw_text(
             "{:.0f}m".format(altitude).replace("-", "."),
             int(EPD_WIDTH / 1.5) - comic_code_24.height - 2,

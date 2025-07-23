@@ -360,7 +360,14 @@ async def sensor_task():
 
             # Only refresh the screen every x cycles
             if config["screen"]["enabled"] and screen_refresh_wait == 0:
-                waveshare213.draw_display(co2, celsius, relative_humidity)
+                waveshare213.draw_display(
+                    co2,
+                    celsius,
+                    relative_humidity,
+                    altitude=(
+                        elevation_m if config["screen"].get("show_altitude") else None
+                    ),
+                )
                 screen_refresh_wait = (
                     config["screen"]["refresh_rate_wlan"]
                     if wlan_enabled()

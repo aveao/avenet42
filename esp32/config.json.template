@@ -3,6 +3,7 @@
     "lightsleep": true,
     "screen": {
         "enabled": true,
+        "show_altitude": true,
         "refresh_rate": 3,
         "refresh_rate_wlan": 3,
         "debug": true,
