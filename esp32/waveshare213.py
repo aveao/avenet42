@@ -24,11 +24,8 @@ if config["spi"]["use_softspi"]:
         miso=DUMMY_PIN,
     )
 else:
-    spi = SPI(
-        id=config["spi"]["hw_bus_id"],
-        baudrate=config["spi"]["baudrate"],
-        firstbit=SPI.MSB,
-    )
+    spi = SPI(config["spi"]["hw_bus_id"])
+    spi.init(baudrate=config["spi"]["baudrate"], firstbit=SPI.MSB)
 
 
 LINE_WIDTH = int(EPD_WIDTH / 8) if (EPD_WIDTH % 8 == 0) else int(EPD_WIDTH / 8 + 1)
