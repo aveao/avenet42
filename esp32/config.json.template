@@ -1,10 +1,10 @@
 {
     "debug": 1,
-    "lightsleep": false,
+    "lightsleep": true,
     "screen": {
         "enabled": true,
-        "refresh_rate": 4,
-        "refresh_rate_wlan": 4,
+        "refresh_rate": 3,
+        "refresh_rate_wlan": 3,
         "debug": true,
         "width": 122,
         "height": 250
@@ -40,6 +40,7 @@
     ],
     "history_size": 50,
     "wlan": {
+        "enabled": true,
         "ssid": "SSIDGoesHere",
         "password": "password-goes-here",
         "connection_wait_s": 10
