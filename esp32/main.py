@@ -276,7 +276,8 @@ async def sensor_task():
         waveshare213.draw_display(0, 0, 0)
 
     low_power_bytes = bytes([int(config["scd41"]["low_power"])])
-    historic_co2_data = low_power_bytes + bytes(config["history_size"] * 2)
+    if config.get("history_size"):
+        historic_co2_data = low_power_bytes + bytes(config["history_size"] * 2)
 
     last_run = utime.ticks_ms() / 1000
     screen_refresh_wait = 1
@@ -317,11 +318,12 @@ async def sensor_task():
             relative_humidity,
         ) = await scd41.read_measurement()
 
-        historic_co2_data = (
-            low_power_bytes
-            + historic_co2_data[(config["history_size"] * -2) + 2 :]
-            + struct.pack(">H", co2)
-        )
+        if config.get("history_size"):
+            historic_co2_data = (
+                low_power_bytes
+                + historic_co2_data[(config["history_size"] * -2) + 2 :]
+                + struct.pack(">H", co2)
+            )
 
         if measurement_status:
             if "co2" in log_files:
@@ -346,7 +348,8 @@ async def sensor_task():
                 rh_characteristic.write(
                     struct.pack("<I", int(relative_humidity * 100)), send_update=True
                 )
-                co2_historic_characteristic.write(historic_co2_data)
+                if config.get("history_size"):
+                    co2_historic_characteristic.write(historic_co2_data)
 
             led_co2_trigger_value = config["led"][
                 "co2_trigger_wlan" if wlan_enabled() else "co2_trigger"
