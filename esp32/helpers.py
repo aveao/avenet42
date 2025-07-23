@@ -82,8 +82,11 @@ async def replace_config(new_config_bytes: bytes):
 
 
 def wlan_enabled() -> bool:
+    if not config["wlan"].get("enabled"):
+        return False
+
     if not config["pins"].get("wlan"):
-        return True
+        return config["wlan"]["enabled"]
 
     return bool(wlan_pin.value())
 
@@ -101,14 +104,14 @@ def rf_used() -> bool:
 
 def appropriate_sleep(duration_s: int):
     if config["lightsleep"] and not rf_used():
-        lightsleep(duration_s * 1000)
+        lightsleep(int(duration_s * 1000))
     else:
         utime.sleep(duration_s)
 
 
 async def appropriate_async_sleep(duration_s: int):
     if config["lightsleep"] and not rf_used():
-        lightsleep(duration_s * 1000)
+        lightsleep(int(duration_s * 1000))
     else:
         await uasyncio.sleep(duration_s)
 

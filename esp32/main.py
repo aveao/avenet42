@@ -273,6 +273,7 @@ async def sensor_task():
 
     if config["screen"]["enabled"]:
         waveshare213.init_display()
+        waveshare213.draw_display(0, 0, 0)
 
     low_power_bytes = bytes([int(config["scd41"]["low_power"])])
     historic_co2_data = low_power_bytes + bytes(config["history_size"] * 2)
