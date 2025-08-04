@@ -338,7 +338,7 @@ def draw_display(co2_ppm, celsius, rh, altitude: int | None = None):
 
     if altitude is not None:
         draw_text(
-            "{:.0f}m".format(altitude).replace("-", "."),
+            "{:.0f}m".format(altitude),
             int(EPD_WIDTH / 1.5) - comic_code_24.height - 2,
             EPD_HEIGHT - 5,
             comic_code_24,

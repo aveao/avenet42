@@ -3,11 +3,12 @@ from PIL import Image
 # note: font width needs to be 8-aligned
 
 input_name = "font_small.png"
+output_dir = "../esp32/"
 output_name = "comic_code_24.py"
 output_name_bin = "comic_code_24.bin"
 font_width = 16
 font_height = 36
-font_chars = "CRHpm1234567890.°%$Є"
+font_chars = "Є$CRHbotingavenepm1234567890-.°%"
 # input_name = "font_large.png"
 # output_name = "comic_code_48.py"
 # output_name_bin = "comic_code_48.bin"
@@ -99,12 +100,12 @@ for font_char in font_chars:
     )
 
 
-with open(output_name, "w") as f:
+with open(output_dir + output_name, "w") as f:
     f.write(f"width = {font_width}\n")
     f.write(f"height = {font_height}\n")
     f.write(f'chars = "{font_chars}"\n')
     f.write(f'bin_filename = "{output_name_bin}"\n')
 
 
-with open(output_name_bin, "wb") as f:
+with open(output_dir + output_name_bin, "wb") as f:
     f.write(bytes(bytes_array))
