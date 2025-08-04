@@ -275,7 +275,7 @@ async def sensor_task():
 
     if config["screen"]["enabled"]:
         waveshare213.init_display()
-        waveshare213.draw_display(0, 0, 0)
+        waveshare213.draw_display_booting()
 
     low_power_bytes = bytes([int(config["scd41"]["low_power"])])
     if config.get("history_size"):

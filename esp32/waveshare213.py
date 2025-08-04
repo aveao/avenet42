@@ -280,6 +280,54 @@ def clean_fbuf():
         fbuf[i] = 0xFF
 
 
+def draw_display_booting():
+    clean_fbuf()
+    gc.collect()
+
+    line_height_24 = comic_code_24.height + 4
+
+    draw_text(
+        "avenet42",
+        int(EPD_WIDTH / 2),
+        int(EPD_HEIGHT / 2),
+        comic_code_24,
+        transparent_color=0,
+        rot=1,
+    )
+
+    draw_text(
+        "booting",
+        int(EPD_WIDTH / 2) - line_height_24,
+        int(EPD_HEIGHT / 2),
+        comic_code_24,
+        transparent_color=0,
+        rot=1,
+    )
+
+    if bt_enabled():
+        draw_text(
+            "Є",
+            0,
+            0,
+            comic_code_24,
+            rot=1,
+            transparent_color=0,
+            offset_for_length=False,
+        )
+    if wlan_enabled():
+        draw_text(
+            "$",
+            comic_code_24.height,
+            0,
+            comic_code_24,
+            rot=1,
+            transparent_color=0,
+            offset_for_length=False,
+        )
+
+    display(fbuf)
+
+
 def draw_display(co2_ppm, celsius, rh, altitude: int | None = None):
     clean_fbuf()
     gc.collect()
@@ -306,12 +354,12 @@ def draw_display(co2_ppm, celsius, rh, altitude: int | None = None):
 
     co2_text = "{}".format(co2_ppm)
     co2_offset = int(comic_code_48.width * (len(co2_text) / 2))
-    # 1.5 for len("ppd") / 2
-    ppd_offset = int(comic_code_24.width * 1.5)
+    # 1.5 for len("ppm") / 2
+    ppm_offset = int(comic_code_24.width * 1.5)
     draw_text(
         co2_text,
         int(EPD_WIDTH / 3) - comic_code_24.height,
-        int(EPD_HEIGHT / 2) - ppd_offset,
+        int(EPD_HEIGHT / 2) - ppm_offset,
         comic_code_48,
         transparent_color=0,
         rot=1,
@@ -383,6 +431,7 @@ def draw_display(co2_ppm, celsius, rh, altitude: int | None = None):
 
 if __name__ == "__main__":
     init_display()
+    draw_display_booting()
     draw_display(6969, 10.42, 50.69, altitude=10)
     draw_display(420, 10.42, 50.69, altitude=-1000)
     draw_display(0, 0, 0)
