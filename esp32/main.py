@@ -238,6 +238,8 @@ async def sensor_task():
     serial_number = await scd41.get_serial_number()
     await scd41.set_automatic_self_calibration_enabled(config["scd41"]["asc"])
     asc_status = await scd41.get_automatic_self_calibration_enabled()
+    if "temp_offset" in config["scd41"]:
+        await scd41.set_temperature_offset(config["scd41"]["temp_offset"])
     sensor_altitude_masl = await scd41.get_sensor_altitude()
     temp_offset = await scd41.get_temperature_offset()
     free_storage = uos.statvfs("/")[1] * uos.statvfs("/")[3]
