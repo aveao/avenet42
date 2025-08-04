@@ -415,6 +415,10 @@ async def sensor_task():
 
 async def main():
     tasks = []
+    if "cpu_frequency" in config:
+        machine.freq(config["cpu_frequency"])
+    debug_print("CPU frequency set to", machine.freq())
+
     tasks.append(uasyncio.create_task(sensor_task()))
     if config["bluetooth"]["enabled"]:
         tasks.append(uasyncio.create_task(bluetooth_task()))
