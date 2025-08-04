@@ -1,5 +1,6 @@
 from helpers import _write_to_i2c, debug_print
 from machine import I2C
+import math
 import struct
 
 
@@ -62,10 +63,14 @@ class SCD41:
         parameters += bytes([_calc_crc8(parameters)])
         await _write_to_i2c(self.i2c_instance, b"\x24\x27" + parameters)
 
-    async def get_temperature_offset(self) -> float:
+    async def get_temperature_offset_raw(self) -> float:
         response = await _write_to_i2c(self.i2c_instance, b"\x23\x18", read_bytes=3)
         temp_offset = 175 * (struct.unpack(">H", response[0:2])[0] / 2**16)
         return temp_offset
+
+    async def get_temperature_offset(self) -> float:
+        raw_temp_offset = await self.get_temperature_offset_raw()
+        return math.ceil(raw_temp_offset * 10) / 10
 
     async def set_temperature_offset(self, temperature_offset: float):
         parameters = struct.pack(">H", int((temperature_offset * 2**16) / 175))
