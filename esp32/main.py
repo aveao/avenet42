@@ -171,7 +171,7 @@ async def bmp180_task(
         or config["bmp180"]["lower_pressure"] > pressure_pa
     ):
         debug_print("Rejecting pressure due to drift")
-        return pressure_pa
+        return pressure_pa, 0.0
 
     await scd41_inst.set_ambient_pressure(int(pressure_pa / 100))
     # Notify the pressure-related stuff early
@@ -186,10 +186,9 @@ async def bmp180_task(
 
 
 async def bmp280_task(
-    bmp280_inst: BMP280,
-    scd41_inst: SCD41,
+    bmp280_inst: BMP280, scd41_inst: SCD41, temperature: float
 ) -> (float, float):
-    pressure_pa = bmp280_inst.pressure
+    pressure_pa = bmp280_inst.pressure_with_ext_temp(temperature)
     elevation_m = pressure_to_altitude(pressure_pa / 100)
 
     debug_print(
@@ -204,7 +203,7 @@ async def bmp280_task(
         or config["bmp280"]["lower_pressure"] > pressure_pa
     ):
         debug_print("Rejecting pressure due to drift")
-        return pressure_pa
+        return pressure_pa, 0.0
 
     await scd41_inst.set_ambient_pressure(int(pressure_pa / 100))
     # Notify the pressure-related stuff early
@@ -283,6 +282,7 @@ async def sensor_task():
 
     last_run = utime.ticks_ms() / 1000
     screen_refresh_wait = 1
+    celsius = None
 
     while True:
         # running GC regularly manually is recommended
@@ -300,8 +300,8 @@ async def sensor_task():
                 log_files["pressure"].write(
                     struct.pack(">I", int(pressure_pa * 10))[1:]
                 )
-        elif use_bmp280:
-            pressure_pa, elevation_m = await bmp280_task(bmp280, scd41)
+        elif use_bmp280 and (celsius is not None):
+            pressure_pa, elevation_m = await bmp280_task(bmp280, scd41, celsius)
             if "pressure" in log_files:
                 # drop the first byte, always 0
                 log_files["pressure"].write(
@@ -367,7 +367,9 @@ async def sensor_task():
                     celsius,
                     relative_humidity,
                     altitude=(
-                        elevation_m if config["screen"].get("show_altitude") else None
+                        elevation_m
+                        if config["screen"].get("show_altitude") and elevation_m
+                        else None
                     ),
                 )
                 screen_refresh_wait = (

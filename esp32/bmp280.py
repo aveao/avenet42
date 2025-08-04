@@ -2,6 +2,7 @@ from micropython import const
 from ustruct import unpack as unp
 
 # Author David Stenwall (david at stenwall.io)
+# Modified by ave (githubpublic at ave.zone)
 
 # Power Modes
 BMP280_POWER_SLEEP = const(0)
@@ -52,11 +53,11 @@ BMP280_OS_ULTRAHIGH = const(4)
 # Oversampling matrix
 # (PRESS_OS, TEMP_OS, sample time in ms)
 _BMP280_OS_MATRIX = [
-    [BMP280_PRES_OS_1, BMP280_TEMP_OS_1, 7],
-    [BMP280_PRES_OS_2, BMP280_TEMP_OS_1, 9],
-    [BMP280_PRES_OS_4, BMP280_TEMP_OS_1, 14],
-    [BMP280_PRES_OS_8, BMP280_TEMP_OS_1, 23],
-    [BMP280_PRES_OS_16, BMP280_TEMP_OS_2, 44],
+    [BMP280_PRES_OS_1, BMP280_TEMP_OS_SKIP, 7],
+    [BMP280_PRES_OS_2, BMP280_TEMP_OS_SKIP, 9],
+    [BMP280_PRES_OS_4, BMP280_TEMP_OS_SKIP, 14],
+    [BMP280_PRES_OS_8, BMP280_TEMP_OS_SKIP, 23],
+    [BMP280_PRES_OS_16, BMP280_TEMP_OS_SKIP, 44],
 ]
 
 # Use cases
@@ -213,29 +214,37 @@ class BMP280:
             self._t = ((self._t_fine * 5 + 128) >> 8) / 100.0
         return self._t
 
+    def _pressure(self, t_fine):
+        var1 = t_fine - 128000
+        var2 = var1 * var1 * self._P6
+        var2 = var2 + ((var1 * self._P5) << 17)
+        var2 = var2 + (self._P4 << 35)
+        var1 = ((var1 * var1 * self._P3) >> 8) + ((var1 * self._P2) << 12)
+        var1 = (((1 << 47) + var1) * self._P1) >> 33
+
+        if var1 == 0:
+            return 0
+
+        p = 1048576 - self._p_raw
+        p = int((((p << 31) - var2) * 3125) / var1)
+        var1 = (self._P9 * (p >> 13) * (p >> 13)) >> 25
+        var2 = (self._P8 * p) >> 19
+
+        p = ((p + var1 + var2) >> 8) + (self._P7 << 4)
+        return p / 256.0
+
     @property
     def pressure(self):
         # From datasheet page 22
         self._calc_t_fine()
         if self._p == 0:
-            var1 = self._t_fine - 128000
-            var2 = var1 * var1 * self._P6
-            var2 = var2 + ((var1 * self._P5) << 17)
-            var2 = var2 + (self._P4 << 35)
-            var1 = ((var1 * var1 * self._P3) >> 8) + ((var1 * self._P2) << 12)
-            var1 = (((1 << 47) + var1) * self._P1) >> 33
-
-            if var1 == 0:
-                return 0
-
-            p = 1048576 - self._p_raw
-            p = int((((p << 31) - var2) * 3125) / var1)
-            var1 = (self._P9 * (p >> 13) * (p >> 13)) >> 25
-            var2 = (self._P8 * p) >> 19
-
-            p = ((p + var1 + var2) >> 8) + (self._P7 << 4)
-            self._p = p / 256.0
+            self._p = self._pressure(self._t_fine)
         return self._p
+
+    def pressure_with_ext_temp(self, celsius):
+        self._gauge()
+        t_fine = int((int(celsius * 100) << 8) / 5)
+        return self._pressure(t_fine)
 
     def _write_bits(self, address, value, length, shift=0):
         d = self._read(address)[0]
