@@ -73,6 +73,9 @@ class SCD41:
         return math.ceil(raw_temp_offset * 10) / 10
 
     async def set_temperature_offset(self, temperature_offset: float):
+        current_temp_offset = await self.get_temperature_offset()
+        if current_temp_offset == temperature_offset:
+            debug_print("Avoiding setting SCD41 temperature offset as it's already set to same.")
         parameters = struct.pack(">H", int((temperature_offset * 2**16) / 175))
         parameters += bytes([_calc_crc8(parameters)])
         await _write_to_i2c(self.i2c_instance, b"\x24\x1d" + parameters)
