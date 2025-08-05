@@ -15,6 +15,7 @@ from helpers import (
     wlan_enabled,
     bt_enabled,
     pressure_to_altitude,
+    set_cpu_freq_by_config,
 )
 from influx_helpers import send_metrics_to_influx
 from web_server import set_webserver_status_data
@@ -188,7 +189,8 @@ async def bmp180_task(
 async def bmp280_task(
     bmp280_inst: BMP280, scd41_inst: SCD41, temperature: float
 ) -> (float, float):
-    pressure_pa = bmp280_inst.pressure_with_ext_temp(temperature)
+    temp_offset = config["scd41"].get("temp_offset", 4)
+    pressure_pa = bmp280_inst.pressure_with_ext_temp(temperature + temp_offset)
     elevation_m = pressure_to_altitude(pressure_pa / 100)
 
     debug_print(
@@ -415,9 +417,7 @@ async def sensor_task():
 
 async def main():
     tasks = []
-    if "cpu_frequency" in config:
-        machine.freq(config["cpu_frequency"])
-    debug_print("CPU frequency set to", machine.freq())
+    set_cpu_freq_by_config()
 
     tasks.append(uasyncio.create_task(sensor_task()))
     if config["bluetooth"]["enabled"]:

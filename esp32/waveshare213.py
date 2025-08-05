@@ -1,9 +1,16 @@
 from machine import SPI, SoftSPI, Pin
+import machine
 import gc
 import time
 import comic_code_24
 import comic_code_48
-from helpers import debug_print, config, wlan_enabled, bt_enabled
+from helpers import (
+    debug_print,
+    config,
+    wlan_enabled,
+    bt_enabled,
+    set_cpu_freq_by_config,
+)
 
 CS_PIN = Pin(config["pins"]["screen_cs"], mode=Pin.OUT, value=1)
 BUSY_PIN = Pin(config["pins"]["screen_busy"], mode=Pin.IN)
@@ -329,6 +336,9 @@ def draw_display_booting():
 
 
 def draw_display(co2_ppm, celsius, rh, altitude: int | None = None):
+    if "cpu_frequency" in config["screen"]:
+        machine.freq(config["screen"]["cpu_frequency"])
+
     clean_fbuf()
     gc.collect()
     top_bar_height = int(EPD_WIDTH / 3)
@@ -427,6 +437,8 @@ def draw_display(co2_ppm, celsius, rh, altitude: int | None = None):
         )
 
     display(fbuf)
+
+    set_cpu_freq_by_config()
 
 
 if __name__ == "__main__":

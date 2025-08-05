@@ -122,6 +122,13 @@ def debug_print(*args, log_level=1):
     print(*args)
 
 
+def set_cpu_freq_by_config():
+    relevant_key = "cpu_frequency_wlan" if wlan_enabled else "cpu_frequency"
+    if relevant_key in config:
+        machine.freq(config[relevant_key])
+    debug_print("CPU frequency set to", machine.freq())
+
+
 async def ensure_wlan_connected(wlan: network.WLAN) -> bool:
     try:
         while not wlan.isconnected():

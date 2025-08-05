@@ -1,13 +1,15 @@
 {
     "debug": 1,
     "lightsleep": true,
-    "cpu_frequency": 40000000,
+    "cpu_frequency": 20000000,
+    "cpu_frequency_wlan": 80000000,
     "screen": {
         "enabled": true,
         "show_altitude": true,
         "refresh_rate": 3,
         "refresh_rate_wlan": 3,
         "debug": true,
+        "cpu_frequency": 160000000,
         "width": 122,
         "height": 250
     },
